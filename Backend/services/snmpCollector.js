@@ -19,7 +19,7 @@
 const snpm = require('snmp-native'); // library to interact with SNMP devices
 const logger = require('../utils/logger'); // centralized logging helper
 const mongoose = require('mongoose'); // MongoDB ORM
-const {kafka} = require('kafka'); // Kafka client (expected to expose a constructor)
+const {kafka} = require('kafkajs'); // Kafka client (expected to expose a constructor)
 
 // Mongoose model: stores a snapshot of traffic/system metrics for a device/interface
 const TrafficMetric = mongoose.model('TrafficMetric', new mongoose.Schema({
