@@ -38,8 +38,8 @@ const TrafficMetric = mongoose.model('TrafficMetric', new mongoose.Schema({
 // Kafka Producer Setup
 // - Instantiate a Kafka client and create a producer to publish raw measurement messages.
 // - Ensure your Kafka broker is reachable at the address below, or change as needed.
-const kafka = new kafka({clientId: 'snmp-collector', brokers: ['localhost:9092']});
-const producer = kafka.producer();
+const kafkaClient = new kafka({clientId: 'snmp-collector', brokers: ['localhost:9092']});
+const producer = kafkaClient.producer();
 
 // Example devices to poll. In a real installation this could be driven by a
 // configuration file or a database table and would include device-specific
