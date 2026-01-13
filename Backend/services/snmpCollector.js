@@ -16,10 +16,19 @@
  */
 
 // External dependencies
-const snpm = require('snmp-native'); // library to interact with SNMP devices
+const { Session, Version2c } = require('snmp-native'); // library to interact with SNMP devices
 const log = console.log;
 const mongoose = require('mongoose'); // MongoDB ORM
-//const {Kafka, Partitioners} = require('kafkajs'); // Kafka client
+
+// Optional Kafka producer (may not be available in lightweight dev setups)
+let producer = null;
+try {
+  const { Kafka, Partitioners } = require('kafkajs');
+  const kafkaClient = new Kafka({ clientId: 'snmp-collector', brokers: ['localhost:9092'] });
+  producer = kafkaClient.producer({ createPartitioner: Partitioners.LegacyPartitioner });
+} catch (err) {
+  log('Kafka client not available; running without producer');
+}
 
 // Mongoose model: stores a snapshot of traffic/system metrics for a device/interface
 const TrafficMetric = mongoose.model('TrafficMetric', new mongoose.Schema({
@@ -88,9 +97,11 @@ class SNMPCollector {
             return this.sessionCache.get(device.id);
         }
 
-        const session = snpm.createSession(device.host, device.community, {
+        const session = new Session({
+            host: device.host,
+            community: device.community,
             timeout: 3000,
-            version: snpm.Version2c
+            version: Version2c
         });
 
         this.sessionCache.set(device.id, session);
@@ -105,8 +116,13 @@ class SNMPCollector {
      * @param {String|Array} oid - OID to query (array or dot-notation string)
      */
     async getMetric(session, oid) {
+        const resolvedOid = Array.isArray(oid)
+            ? oid
+            : (typeof oid === 'string'
+                ? oid.split('.').map(s => Number(s)).filter(n => !isNaN(n))
+                : oid);
         return new Promise((resolve, reject) => {
-            session.get({oid: oid}, (error, varbinds) => {
+            session.get({ oid: resolvedOid }, (error, varbinds) => {
                 if (error) {
                     return reject(error);
                 }
@@ -126,14 +142,13 @@ class SNMPCollector {
     async pollDevice(device) {
         try{
             const session = await this.createSession(device);
+            const ifIndex = 1; // querying interface index 1
             const metrics = await Promise.allSettled([
-                // For table-based OIDs (array form above), the code appends the
-                // interface index (e.g., '1') to request a specific instance.
-                this.getMetric(session, OIDS.bytesIn + '1'),
-                this.getMetric(session, OIDS.bytesOut + '1'),
-                this.getMetric(session, OIDS.packetsIn + '1'),
-                this.getMetric(session, OIDS.packetsOut + '1'),
-                this.getMetric(session, OIDS.packetsDropped + '1'),
+                this.getMetric(session, [...OIDS.bytesIn, ifIndex]),
+                this.getMetric(session, [...OIDS.bytesOut, ifIndex]),
+                this.getMetric(session, [...OIDS.packetsIn, ifIndex]),
+                this.getMetric(session, [...OIDS.packetsOut, ifIndex]),
+                this.getMetric(session, [...OIDS.packetsDropped, ifIndex]),
                 this.getMetric(session, OIDS.cpuUsage),
                 this.getMetric(session, OIDS.memoryUsage)
             ]);
