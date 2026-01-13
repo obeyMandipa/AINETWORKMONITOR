@@ -17,9 +17,9 @@
 
 // External dependencies
 const snpm = require('snmp-native'); // library to interact with SNMP devices
-const logger = require('../utils/logger'); // centralized logging helper
+const log = console.log;
 const mongoose = require('mongoose'); // MongoDB ORM
-const {kafka} = require('kafkajs'); // Kafka client (expected to expose a constructor)
+const {Kafka} = require('kafkajs'); // Kafka client
 
 // Mongoose model: stores a snapshot of traffic/system metrics for a device/interface
 const TrafficMetric = mongoose.model('TrafficMetric', new mongoose.Schema({
@@ -38,7 +38,7 @@ const TrafficMetric = mongoose.model('TrafficMetric', new mongoose.Schema({
 // Kafka Producer Setup
 // - Instantiate a Kafka client and create a producer to publish raw measurement messages.
 // - Ensure your Kafka broker is reachable at the address below, or change as needed.
-const kafkaClient = new kafka({clientId: 'snmp-collector', brokers: ['localhost:9092']});
+const kafkaClient = new Kafka({clientId: 'snmp-collector', brokers: ['localhost:9092']});
 const producer = kafkaClient.producer();
 
 // Example devices to poll. In a real installation this could be driven by a
@@ -159,13 +159,13 @@ class SNMPCollector {
                 messages: [{value: JSON.stringify(metric)}],
             });
 
-            logger.info(`Polled ${device.id}: ${metric.bytes_in} bytes in`);
+            log(`Polled ${device.id}: ${metric.bytes_in} bytes in`);
             return metric;
         }
 
         catch (error) {
             // Log the error; production code should include retry/backoff logic
-            logger.error(`SNMP poll failed for ${device.id}:`, error)
+            log(`SNMP poll failed for ${device.id}:`, error)
         }
     }
 
@@ -183,7 +183,7 @@ class SNMPCollector {
             }
         }, 3000); // every 3 seconds (adjust to 30s/5m in production)
 
-        logger.info('SNMP Collector started polling devices every 30 secs.');
+        log('SNMP Collector started polling devices every 30 secs.');
     }
 }
 
