@@ -1,3 +1,32 @@
 {"level":"info","message":"Server running on port 3001","timestamp":"2026-01-13T10:56:08.503Z"}
 {"level":"info","message":"MongoDB connected","timestamp":"2026-01-13T10:56:08.546Z"}
+
 {"cause":{"broker":"localhost:9092","code":"ECONNREFUSED","name":"KafkaJSConnectionError","retriable":true},"level":"error","message":"Uncaught Exception: Connection error: ","name":"KafkaJSNumberOfRetriesExceeded","retriable":false,"retryCount":5,"retryTime":6518,"stack":"KafkaJSNonRetriableError\n  Caused by: KafkaJSConnectionError: Connection error: \n    at Socket.onError (C:\\Users\\rufaro\\Documents\\projects\\AiNetworkMonitor\\Backend\\node_modules\\.pnpm\\kafkajs@2.2.4\\node_modules\\kafkajs\\src\\network\\connection.js:210:23)\n    at Socket.emit (node:events:518:28)\n    at emitErrorNT (node:internal/streams/destroy:170:8)\n    at emitErrorCloseNT (node:internal/streams/destroy:129:3)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)","timestamp":"2026-01-13T10:56:15.563Z"}
+
+{"level":"info","message":"Server running on port 3001","timestamp":"2026-01-13T12:53:39.986Z"}
+
+{"level":"info","message":"MongoDB connected","timestamp":"2026-01-13T12:53:40.035Z"}
+
+{"cause":{"broker":"localhost:9092","code":"ECONNREFUSED","name":"KafkaJSConnectionError","retriable":true},"level":"error","message":"Uncaught Exception: Connection error: ","name":"KafkaJSNumberOfRetriesExceeded","retriable":false,"retryCount":5,"retryTime":6046,"stack":"KafkaJSNonRetriableError\n  Caused by: KafkaJSConnectionError: Connection error: \n    at Socket.onError (C:\\Users\\rufaro\\Documents\\projects\\AiNetworkMonitor\\Backend\\node_modules\\.pnpm\\kafkajs@2.2.4\\node_modules\\kafkajs\\src\\network\\connection.js:210:23)\n    at Socket.emit (node:events:518:28)\n    at emitErrorNT (node:internal/streams/destroy:170:8)\n    at emitErrorCloseNT (node:internal/streams/destroy:129:3)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)","timestamp":"2026-01-13T12:53:47.132Z"}
+
+┌─ 2026-01-13 15:06:57 [INFO] ────────────────────────────────
+│  Server running on port 3001
+└───────────────────────────────────────────────────────────────────────────
+
+
+┌─ 2026-01-13 15:06:58 [INFO] ────────────────────────────────
+│  MongoDB connected
+└───────────────────────────────────────────────────────────────────────────
+
+
+┌─ 2026-01-13 15:07:08 [ERROR] ────────────────────────────────
+│  Uncaught Exception: Connection error: 
+KafkaJSNonRetriableError
+  Caused by: KafkaJSConnectionError: Connection error: 
+    at Socket.onError (C:\Users\rufaro\Documents\projects\AiNetworkMonitor\Backend\node_modules\.pnpm\kafkajs@2.2.4\node_modules\kafkajs\src\network\connection.js:210:23)
+    at Socket.emit (node:events:518:28)
+    at emitErrorNT (node:internal/streams/destroy:170:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+└───────────────────────────────────────────────────────────────────────────
+

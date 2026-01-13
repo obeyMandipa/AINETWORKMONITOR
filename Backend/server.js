@@ -41,7 +41,7 @@ app.get('/api/metrics', async (req, res) => {
     logger.error('Metrics API error:', error);
     res.status(500).json({ error: 'Failed to fetch metrics' });
   }
-});
+}); console
 
 app.get('/api/metrics/:device', async (req, res) => {
   try {
