@@ -76,7 +76,7 @@ global.io = io;
 
 //start SNMP polling
 const collector = new SNMPCollector();
-collector.startPolling();
+collector.startPolling(io); // ✅ NEW - passes Socket.io
 
 // Error handling
 process.on('uncaughtException', (error) => {

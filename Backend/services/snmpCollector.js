@@ -19,7 +19,7 @@
 const snpm = require('snmp-native'); // library to interact with SNMP devices
 const log = console.log;
 const mongoose = require('mongoose'); // MongoDB ORM
-const {Kafka, Partitioners} = require('kafkajs'); // Kafka client
+//const {Kafka, Partitioners} = require('kafkajs'); // Kafka client
 
 // Mongoose model: stores a snapshot of traffic/system metrics for a device/interface
 const TrafficMetric = mongoose.model('TrafficMetric', new mongoose.Schema({
@@ -38,10 +38,10 @@ const TrafficMetric = mongoose.model('TrafficMetric', new mongoose.Schema({
 // Kafka Producer Setup
 // - Instantiate a Kafka client and create a producer to publish raw measurement messages.
 // - Ensure your Kafka broker is reachable at the address below, or change as needed.
-const kafkaClient = new Kafka({clientId: 'snmp-collector', brokers: ['localhost:9092']});
-const producer = kafkaClient.producer({
-    createPartitioner: Partitioners.LegacyPartitioner
-});
+// const kafkaClient = new Kafka({clientId: 'snmp-collector', brokers: ['localhost:9092']});
+// const producer = kafkaClient.producer({
+//     createPartitioner: Partitioners.LegacyPartitioner
+// }); COMMENTED OUT FOR SIMPLICITY TESTING PURPOSES
 
 // Example devices to poll. In a real installation this could be driven by a
 // configuration file or a database table and would include device-specific
@@ -155,11 +155,11 @@ class SNMPCollector {
             // Persist to MongoDB for long-term storage / historical queries
             await TrafficMetric.create(metric);
 
-            // Publish raw message to Kafka for downstream pipelines (parsing, alerts, etc.)
-            await producer.send({
-                topic: 'raw_metrics',
-                messages: [{value: JSON.stringify(metric)}],
-            });
+            // Publish raw message to Kafka for downstream pipelines (parsing, alerts, etc.) 
+            // await producer.send({
+            //     topic: 'raw_metrics',
+            //     messages: [{value: JSON.stringify(metric)}],
+            // }); COMMENTED OUT FOR SIMPLICITY TESTING PURPOSES
 
             log(`Polled ${device.id}: ${metric.bytes_in} bytes in`);
             return metric;
@@ -173,19 +173,23 @@ class SNMPCollector {
 
     /**
      * startPolling()
-     *  - Connects the Kafka producer and starts a periodic polling loop.
      *  - The interval here is short for demo purposes; adjust to your needs.
      */
-    async startPolling() {
-        await producer.connect();
-
+    startPolling(io) {  // ← Added 'io' parameter
         setInterval(async () => {
             for (const device of DEVICES) {
-                await this.pollDevice(device);
+                try {
+                    const metric = await this.pollDevice(device);
+                    if (metric) {
+                        io.emit('metrics_update', metric);  // ← Real-time dashboard
+                    }
+                } catch (error) {
+                    log(`Polling cycle error: ${error.message}`);
+                }
             }
-        }, 3000); // every 3 seconds (adjust to 30s/5m in production)
+        }, 30000);  // 30 seconds
 
-        log('SNMP Collector started polling devices every 30 secs.');
+        log('✅ SNMP Collector started - polling every 30 seconds');
     }
 }
 
