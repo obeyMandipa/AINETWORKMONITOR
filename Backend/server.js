@@ -12,7 +12,7 @@ const logger = require('./utils/logger');
 
 // Express app setup
 const app = express();
-const server = http.createServer(app);
+const server = createServer(app);
 const io = new Server(server, {
     cors: {
         origin: "http://localhost:3000",
@@ -30,12 +30,24 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/network_m
 
 
 //metrics API endpoint
-app.get('/api/metrics/:device?', async (req, res) => {
+app.get('/api/metrics', async (req, res) => {
+  try {
+    const TrafficMetric = mongoose.model('TrafficMetric');
+    const metrics = await TrafficMetric.find({})
+      .sort({ timestamp: -1 })
+      .limit(100);
+    res.json(metrics);
+  } catch (error) {
+    logger.error('Metrics API error:', error);
+    res.status(500).json({ error: 'Failed to fetch metrics' });
+  }
+});
+
+app.get('/api/metrics/:device', async (req, res) => {
   try {
     const TrafficMetric = mongoose.model('TrafficMetric');
     const { device } = req.params;
-    const query = device ? { device_id: device } : {};
-    const metrics = await TrafficMetric.find(query)
+    const metrics = await TrafficMetric.find({ device_id: device })
       .sort({ timestamp: -1 })
       .limit(100);
     res.json(metrics);

@@ -19,7 +19,7 @@
 const snpm = require('snmp-native'); // library to interact with SNMP devices
 const log = console.log;
 const mongoose = require('mongoose'); // MongoDB ORM
-const {Kafka} = require('kafkajs'); // Kafka client
+const {Kafka, Partitioners} = require('kafkajs'); // Kafka client
 
 // Mongoose model: stores a snapshot of traffic/system metrics for a device/interface
 const TrafficMetric = mongoose.model('TrafficMetric', new mongoose.Schema({
@@ -39,7 +39,9 @@ const TrafficMetric = mongoose.model('TrafficMetric', new mongoose.Schema({
 // - Instantiate a Kafka client and create a producer to publish raw measurement messages.
 // - Ensure your Kafka broker is reachable at the address below, or change as needed.
 const kafkaClient = new Kafka({clientId: 'snmp-collector', brokers: ['localhost:9092']});
-const producer = kafkaClient.producer();
+const producer = kafkaClient.producer({
+    createPartitioner: Partitioners.LegacyPartitioner
+});
 
 // Example devices to poll. In a real installation this could be driven by a
 // configuration file or a database table and would include device-specific
