@@ -61,6 +61,32 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+app.post('/api/anomaly', async (req, res) => {
+  try {
+    const metric = req.body;
+    logger.info('Received anomaly prediction request:', metric);
+    
+    const response = await fetch('http://localhost:8000/predict', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(metric),
+      timeout: 10000
+    });
+    
+    if (!response.ok) {
+      logger.error('ML services returned error:', response.status, response.statusText);
+      return res.status(response.status).json({ error: 'ML services error' });
+    }
+    
+    const result = await response.json();
+    res.json(result);
+  } catch (error) {
+    logger.error('Anomaly prediction error:', error.message);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+
 // Socket.io Real-time Updates
 io.on('connection', (socket) => {
   logger.info('Dashboard client connected:', socket.id);

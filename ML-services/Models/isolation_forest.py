@@ -36,14 +36,20 @@ class AnomalyDetector:
 
     def predict(self, X):
         """Predict anomalies"""
-        X_scaled =  self.preprocessor.scaler.transform(X)
-        predictions = self.model.predict(X_scaled)
-        scores = self.model.decision_function(X_scaled)
+        # Note: Isolation Forest doesn't require scaling, but we keep the structure for consistency
+        # If X is a DataFrame, convert to numpy
+        if hasattr(X, 'values'):
+            X_array = X.values
+        else:
+            X_array = X
+        
+        predictions = self.model.predict(X_array)
+        scores = self.model.decision_function(X_array)
 
         return [{
             'is_anomaly': pred == -1,
-            'anomaly_score': score[0], # higher means more normal
-            'features': X.iloc[0].to_dict()
+            'anomaly_score': float(score), # higher means more normal
+            'threshold': -0.5
         } for pred, score in zip(predictions, scores)]
     
     def load(self):
