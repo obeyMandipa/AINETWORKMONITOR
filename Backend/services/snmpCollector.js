@@ -32,7 +32,7 @@ try {
 
 // Mongoose model: stores a snapshot of traffic/system metrics for a device/interface
 const TrafficMetric = mongoose.model('TrafficMetric', new mongoose.Schema({
-    deviceId: String,
+    device_Id: String,
     interface: String,
     timestamp: {type: Date, default: Date.now},
     bytesIn: Number,

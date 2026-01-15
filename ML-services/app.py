@@ -10,7 +10,7 @@ network metrics from a MongoDB database.
 """
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from models.isolation_forest import AnomalyDetector
+from Models.isolation_forest import AnomalyDetector
 import pymongo
 import pandas as pd
 import numpy as np

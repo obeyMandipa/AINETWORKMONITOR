@@ -36,7 +36,7 @@ class LSTMAutoencoder:
     def build_model(self):
         """Build the LSTM Autoencoder model architecture."""
         model = tf.keras.Sequential([
-            tf.keras.layers.LSTM(64, return_sequences=True, input_shape=(self.timesteps, self.features)),
+            tf.keras.layers.LSTM(64, return_sequences=True, input_shape=(self.timesteps, self.n_features)),
             tf.keras.layers.Dropout(0.2),
             tf.keras.layers.LSTM(32, return_sequences=True),
             tf.keras.layers.Dropout(0.2),
@@ -44,7 +44,7 @@ class LSTMAutoencoder:
             tf.keras.layers.LSTM(32, return_sequences=True),
             tf.keras.layers.Dropout(0.2),
             tf.keras.layers.LSTM(64, return_sequences=True),
-            tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(self.features))
+            tf.keras.layers.TimeDistributed(tf.keras.layers.Dense(self.n_features))
         ])
         model.compile(optimizer='adam', loss='mse')
         return model

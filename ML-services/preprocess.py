@@ -42,7 +42,7 @@ class NetworkPreprocessor:
         Args:
             metrics_df (pd.DataFrame): DataFrame containing raw SNMP metrics with
                 columns like 'timestamp', 'device_id', 'packets_in', 'bytes_in',
-                'bytes_out', 'packets_dropped', 'cpu_usage', 'latency'.
+                'bytes_out', 'packets_dropped', 'cpu_usage', 'latency_ms'.
 
         Returns:
             pd.DataFrame: Processed DataFrame with engineered features.
@@ -62,8 +62,8 @@ class NetworkPreprocessor:
         df['error_rate'] = df['packets_dropped'] / (df['packets_in'] + 1)
 
         # Compute rolling aggregates over 5-minute windows (10 polls at 30s each)
-        df['rolling_avg_cpu'] = df.groupby('device_id')['cpu_usage'].rolling(10).mean().fillna(method='bfill')
-        df['rolling_avg_latency'] = df.groupby('device_id')['latency'].rolling(10).std().fillna(method='bfill')
+        df['rolling_avg_cpu'] = df.groupby('device_id')['cpu_usage'].transform(lambda x: x.rolling(10, min_periods=1).mean()).bfill()
+        df['rolling_avg_latency'] = df.groupby('device_id')['latency_ms'].transform(lambda x: x.rolling(10, min_periods=1).std()).bfill()
 
         # Extract temporal features: hour of day and day of week for cyclical patterns
         df['hour'] = df['timestamp'].dt.hour
