@@ -29,23 +29,23 @@ class AnomalyDetector:
         self.model = IsolationForest(contamination=0.01, random_state=42)
         self.preprocessor = NetworkPreprocessor()
 
-        def train(self, X_train):
-            """Train on normal traffic patterns"""
-            self.model.fit(X_train)
-            joblib.dump(self.model, 'models/anomaly_detector.joblib')
+    def train(self, X_train):
+        """Train on normal traffic patterns"""
+        self.model.fit(X_train)
+        joblib.dump(self.model, 'Models/anomaly_detector.joblib')
 
-        def predict(self, X):
-            """Predict anomalies"""
-            X_scaled =  self.preprocessor.scaler.transform(X)
-            predictions = self.model.predict(X_scaled)
-            scores = self.model.decisio_function(X_scaled)
+    def predict(self, X):
+        """Predict anomalies"""
+        X_scaled =  self.preprocessor.scaler.transform(X)
+        predictions = self.model.predict(X_scaled)
+        scores = self.model.decision_function(X_scaled)
 
-            return [{
-                'is_anomaly': pred == -1,
-                'anomaly_score': score[0], # higher means more normal
-                'features': X.iloc[i].to_dict()
-            } for pred, score in zip(predictions, scores)]
-        
-        def load(self):
-            """Load the trained model from disk"""
-            self.model = joblib.load('models/anomaly_detector.joblib')
+        return [{
+            'is_anomaly': pred == -1,
+            'anomaly_score': score[0], # higher means more normal
+            'features': X.iloc[0].to_dict()
+        } for pred, score in zip(predictions, scores)]
+    
+    def load(self):
+        """Load the trained model from disk"""
+        self.model = joblib.load('Models/anomaly_detector.joblib')

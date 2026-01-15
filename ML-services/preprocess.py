@@ -130,7 +130,7 @@ class NetworkPreprocessor:
         X_test_scaled = self.scaler.transform(X_test)
 
         # Save the fitted scaler to disk for future use in inference
-        joblib.dump(self.scaler, Path('ML-services/models/nsl_kdd_scaler.pkl'))
+        joblib.dump(self.scaler, Path('Models/nsl_kdd_scaler.pkl'))
 
         return X_train_scaled, X_test_scaled, y_train
 
